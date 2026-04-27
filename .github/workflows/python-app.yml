@@ -18,5 +18,8 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: List directory contents
+      run: ls -la
+
     - name: Run router_dih.py test
       run: python router_dih.py
