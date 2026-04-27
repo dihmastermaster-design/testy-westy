@@ -2,7 +2,7 @@ import socket
 import threading
 import random
 
-# Target IP and port
+# Target IP and porta
 ip = "194.193.147.22"
 port =80 # Packet size
 packet_size =1024
